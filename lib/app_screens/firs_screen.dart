@@ -14,7 +14,7 @@ class FirstScreen extends StatelessWidget {
           style: TextStyle(color: Colors.white, fontSize: 30.0),
         )));
   }
-
+  
   String generateLuckyNumber() {
     var random = Random();
     int luckyNumber = random.nextInt(10);
