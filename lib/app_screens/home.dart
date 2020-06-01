@@ -67,8 +67,18 @@ class Home extends StatelessWidget {
                       ),
                     )
                   ],
-                )
+                ),
+                FlightImageAsset()
               ],
             )));
+  }
+}
+
+class FlightImageAsset extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    AssetImage assetImage = AssetImage('images/plane-64.png');
+    Image image = Image(image: assetImage);
+    return Container(child: image, width: 300.0, height: 300.0);
   }
 }
