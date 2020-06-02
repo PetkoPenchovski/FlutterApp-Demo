@@ -21,11 +21,25 @@ class SIForm extends StatefulWidget {
 
 class _SIFormState extends State<SIForm> {
   String nameCity = "";
-  final _minimumMargin = 5.0;
-  final _minimumPadding = 5.0;
+  final minimumMargin = 5.0;
+  final minimumPadding = 5.0;
 
-  var _currencies = ['Dollar', 'Lev', 'Euro', 'Kuna'];
-  var _ccurentItemSelected = 'Dollar';
+  var currencies = ['Dollar', 'Lev', 'Euro', 'Kuna'];
+  var currentItemSelected = '';
+
+
+  @override
+  void initState() {
+    super.initState();
+    //Initialize static members 
+    currentItemSelected = currencies[0];
+  }
+
+  TextEditingController principalController = TextEditingController();
+  TextEditingController rateOfInterestController = TextEditingController();
+  TextEditingController termController = TextEditingController();
+
+  var displayResult = '';
 
   @override
   Widget build(BuildContext context) {
@@ -36,17 +50,18 @@ class _SIFormState extends State<SIForm> {
         title: Text("Simple Interest Calculator App"),
       ),
       body: Container(
-        margin: EdgeInsets.all(_minimumMargin * 2),
+        margin: EdgeInsets.all(minimumMargin * 2),
         child: ListView(
           //ListView allow the App Screen to be adaptive to different screen devices
           children: <Widget>[
             getImageAsset(),
             Padding(
                 padding: EdgeInsets.only(
-                    top: _minimumPadding, bottom: _minimumPadding),
+                    top: minimumPadding, bottom: minimumPadding),
                 child: TextField(
                   keyboardType: TextInputType.number,
                   style: textStyle,
+                  controller: principalController,
                   decoration: InputDecoration(
                       labelText: 'Principal',
                       hintText: 'Enter Principal e.g. 1000',
@@ -56,10 +71,11 @@ class _SIFormState extends State<SIForm> {
                 )),
             Padding(
                 padding: EdgeInsets.only(
-                    top: _minimumPadding, bottom: _minimumPadding),
+                    top: minimumPadding, bottom: minimumPadding),
                 child: TextField(
                   keyboardType: TextInputType.number,
                   style: textStyle,
+                  controller: rateOfInterestController,
                   decoration: InputDecoration(
                       labelText: 'Rate of Interest',
                       hintText: 'In percent %',
@@ -69,13 +85,14 @@ class _SIFormState extends State<SIForm> {
                 )),
             Padding(
                 padding: EdgeInsets.only(
-                    top: _minimumPadding, bottom: _minimumPadding),
+                    top: minimumPadding, bottom: minimumPadding),
                 child: Row(
                   children: <Widget>[
                     Expanded(
                       child: TextField(
                           keyboardType: TextInputType.number,
                           style: textStyle,
+                          controller: termController,
                           decoration: InputDecoration(
                               labelText: 'Term',
                               hintText: 'Time in years',
@@ -84,24 +101,26 @@ class _SIFormState extends State<SIForm> {
                                   borderRadius: BorderRadius.circular(5.0)))),
                     ),
                     Container(
-                      width: _minimumPadding * 5,
+                      width: minimumPadding * 5,
                     ),
                     Expanded(
                         child: DropdownButton<String>(
-                      items: _currencies.map((String value) {
+                      items: currencies.map((String value) {
                         return DropdownMenuItem<String>(
                           value: value,
                           child: Text(value),
                         );
                       }).toList(),
-                      value: 'Dollar',
-                      onChanged: (String newValueSelected) {},
+                      value: currentItemSelected,
+                      onChanged: (String newValueSelected) {
+                        _onDropDownItemSelected(newValueSelected);
+                      },
                     ))
                   ],
                 )),
             Padding(
                 padding: EdgeInsets.only(
-                    top: _minimumPadding, bottom: _minimumPadding),
+                    top: minimumPadding, bottom: minimumPadding),
                 child: Row(
                   children: <Widget>[
                     Expanded(
@@ -109,7 +128,9 @@ class _SIFormState extends State<SIForm> {
                         color: Theme.of(context).accentColor,
                         textColor: Theme.of(context).primaryColorDark,
                         child: Text('Calculate', textScaleFactor: 1.3),
-                        onPressed: () {},
+                        onPressed: () {
+                          _displayFinalResult();
+                        },
                       ),
                     ),
                     Expanded(
@@ -117,15 +138,17 @@ class _SIFormState extends State<SIForm> {
                         color: Theme.of(context).primaryColorDark,
                         textColor: Theme.of(context).primaryColorLight,
                         child: Text('Reset', textScaleFactor: 1.3),
-                        onPressed: () {},
+                        onPressed: () {
+                          _reset();
+                        },
                       ),
                     )
                   ],
                 )),
             Padding(
-              padding: EdgeInsets.all(_minimumPadding * 2),
+              padding: EdgeInsets.all(minimumPadding * 2),
               child: Text(
-                'TODO Next',
+                this.displayResult,
                 style: textStyle,
               ),
             )
@@ -140,7 +163,42 @@ class _SIFormState extends State<SIForm> {
     Image image = Image(image: assetImage, width: 125.0, height: 125.0);
     return Container(
       child: image,
-      margin: EdgeInsets.all(_minimumMargin * 10),
+      margin: EdgeInsets.all(minimumMargin * 10),
     );
+  }
+
+  void _onDropDownItemSelected(String newValueSelected) {
+    setState(() {
+      this.currentItemSelected = newValueSelected;
+    });
+  }
+
+  String _calculateTotalReturns() {
+    double principal = double.parse(principalController.text);
+    double rateOfInterest = double.parse(rateOfInterestController.text);
+    double term = double.parse(termController.text);
+
+    double totalAmountPayable =
+        principal + (principal * rateOfInterest * term) / 100;
+
+    String result =
+        'After $term years, your investment will be worth $totalAmountPayable in $currentItemSelected';
+    return result;
+  }
+
+  void _displayFinalResult() {
+    setState(() {
+      this.displayResult = _calculateTotalReturns();
+    });
+  }
+
+  void _reset() {
+    setState(() {
+      principalController.text = '';
+      rateOfInterestController.text = '';
+      termController.text = '';
+      displayResult = '';
+      currentItemSelected = currencies[0];
+    });
   }
 }
